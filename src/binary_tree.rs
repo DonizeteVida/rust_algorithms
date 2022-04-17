@@ -78,18 +78,13 @@ where
     }
 
     pub fn print(&self) {
-        fn print<T: Debug>(node: &Node<T>) {
-            if let Some(ref left) = node.left {
-                print(left);
-            }
-            print!("{:?}, ", node.item);
-            if let Some(ref right) = node.right {
-                print(right);
+        fn print<T: Debug>(option: &Option<Box<Node<T>>>) {
+            if let Some(node) = option {
+                print(&node.left);
+                print!("{:?}, ", node.item);
+                print(&node.right);
             }
         }
-        if let Some(ref node) = self.node {
-            print(node);
-        }
-        println!();
+        print(&self.node)
     }
 }
