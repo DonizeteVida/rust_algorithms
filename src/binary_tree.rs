@@ -1,11 +1,11 @@
-pub trait Comparator<T> {
-    fn compare(&self, to_compare: &Self) -> bool;
-}
+use std::cmp::PartialOrd;
 
+#[derive(Debug)]
 pub struct BinaryTree<T> {
     node: Option<Box<Node<T>>>,
 }
 
+#[derive(Debug)]
 struct Node<T> {
     left: Option<Box<Node<T>>>,
     right: Option<Box<Node<T>>>,
@@ -20,30 +20,34 @@ impl<T> Node<T> {
             item,
         }
     }
-
-    fn right(&mut self, node: Node<T>) {
-        self.right = Some(Box::new(node))
-    }
-
-    fn left(&mut self, node: Node<T>) {
-        self.left = Some(Box::new(node))
-    }
 }
 
 impl<T> BinaryTree<T>
 where
-    T: Comparator<T>,
+    T: PartialOrd<T>,
 {
     pub fn new() -> Self {
         BinaryTree { node: None }
     }
 
     pub fn add(&mut self, item: T) {
-        if let Some(ref first) = self.node {
+        if let Some(ref mut first) = self.node {
             let mut last_node = first;
             loop {
-                if (last_node.item.compare(&item)) {
-                    
+                if item > last_node.item {
+                    if let Some(ref mut right) = last_node.right {
+                        last_node = right
+                    } else {
+                        last_node.right = Some(Box::new(Node::new(item)));
+                        break;
+                    }
+                } else {
+                    if let Some(ref mut left) = last_node.left {
+                        last_node = left
+                    } else {
+                        last_node.left = Some(Box::new(Node::new(item)));
+                        break;
+                    }
                 }
             }
         } else {

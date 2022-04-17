@@ -1,12 +1,6 @@
 mod binary_tree;
 
-use binary_tree::{BinaryTree, Comparator};
-
-impl Comparator<i16> for i16 {
-    fn compare(&self, to_compare: &Self) -> bool {
-        self > to_compare
-    }
-}
+use binary_tree::BinaryTree;
 
 fn main() {
     let mut binary_tree = BinaryTree::<i16>::new();
@@ -15,5 +9,5 @@ fn main() {
     binary_tree.add(-1);
     binary_tree.add(-4);
 
-    println!("Hello, world!");
+    println!("{:#?}", binary_tree);
 }
