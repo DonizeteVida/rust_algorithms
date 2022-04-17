@@ -10,4 +10,6 @@ fn main() {
     binary_tree.add(-4);
 
     println!("{:#?}", binary_tree);
+    binary_tree.print();
+    println!("{}", binary_tree.contains(1));
 }

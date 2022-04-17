@@ -1,4 +1,4 @@
-use std::cmp::PartialOrd;
+use std::{cmp::PartialOrd, fmt::Debug};
 
 #[derive(Debug)]
 pub struct BinaryTree<T> {
@@ -25,6 +25,8 @@ impl<T> Node<T> {
 impl<T> BinaryTree<T>
 where
     T: PartialOrd<T>,
+    T: PartialEq<T>,
+    T: Debug,
 {
     pub fn new() -> Self {
         BinaryTree { node: None }
@@ -53,5 +55,41 @@ where
         } else {
             self.node = Some(Box::new(Node::new(item)))
         }
+    }
+
+    pub fn contains(&self, item: T) -> bool {
+        fn contains<T>(option: &Option<Box<Node<T>>>, item: &T) -> bool
+        where
+            T: PartialEq<T>,
+            T: PartialOrd<T>,
+        {
+            if let Some(node) = option {
+                return if *item == node.item {
+                    true
+                } else if *item > node.item {
+                    contains(&node.right, item)
+                } else {
+                    contains(&node.left, item)
+                };
+            }
+            false
+        }
+        contains(&self.node, &item)
+    }
+
+    pub fn print(&self) {
+        fn print<T: Debug>(node: &Node<T>) {
+            if let Some(ref left) = node.left {
+                print(left);
+            }
+            print!("{:?}, ", node.item);
+            if let Some(ref right) = node.right {
+                print(right);
+            }
+        }
+        if let Some(ref node) = self.node {
+            print(node);
+        }
+        println!();
     }
 }
