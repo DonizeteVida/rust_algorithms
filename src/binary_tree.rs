@@ -1,4 +1,4 @@
-use std::{cmp::PartialOrd, fmt::Debug};
+use std::{cmp::PartialOrd, fmt::Debug, mem::replace};
 
 #[derive(Debug)]
 pub struct BinaryTree<T> {
@@ -57,6 +57,43 @@ where
         }
     }
 
+    pub fn inorder<F: Fn(&T)>(&self, f: F) {
+        fn inorder<T, F: Fn(&T)>(f: &F, option: &Option<Box<Node<T>>>) {
+            if let Some(node) = option {
+                inorder(f, &node.left);
+                f(&node.item);
+                inorder(f, &node.right);
+            }
+        }
+        inorder(&f, &self.node);
+    }
+
+    pub fn preorder<F: Fn(&T)>(&self, f: F) {
+        fn preorder<T, F: Fn(&T)>(f: &F, option: &Option<Box<Node<T>>>) {
+            if let Some(node) = option {
+                f(&node.item);
+                preorder(f, &node.left);
+                preorder(f, &node.right);
+            }
+        }
+        preorder(&f, &self.node);
+    }
+
+    pub fn postorder<F: Fn(&T)>(&self, f: F) {
+        fn postorder<T, F: Fn(&T)>(f: &F, option: &Option<Box<Node<T>>>) {
+            if let Some(node) = option {
+                postorder(f, &node.left);
+                postorder(f, &node.right);
+                f(&node.item);
+            }
+        }
+        postorder(&f, &self.node);
+    }
+
+    pub fn remove(&mut self, item: T) -> Option<T> {
+        None
+    }
+
     pub fn contains(&self, item: T) -> bool {
         fn contains<T>(option: &Option<Box<Node<T>>>, item: &T) -> bool
         where
@@ -64,27 +101,86 @@ where
             T: PartialOrd<T>,
         {
             if let Some(node) = option {
-                return if *item == node.item {
+                if *item == node.item {
                     true
                 } else if *item > node.item {
                     contains(&node.right, item)
                 } else {
                     contains(&node.left, item)
-                };
+                }
+            } else {
+                false
             }
-            false
         }
         contains(&self.node, &item)
     }
+}
 
-    pub fn print(&self) {
-        fn print<T: Debug>(option: &Option<Box<Node<T>>>) {
-            if let Some(node) = option {
-                print(&node.left);
-                print!("{:?}, ", node.item);
-                print(&node.right);
-            }
-        }
-        print(&self.node)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_contain_value() {
+        let mut binary_tree = BinaryTree::<i8>::new();
+        binary_tree.add(2);
+        binary_tree.add(3);
+        binary_tree.add(-1);
+        binary_tree.add(-4);
+
+        assert_eq!(binary_tree.contains(-1), true);
+    }
+
+    #[test]
+    fn should_remove_value() {
+        let mut binary_tree = BinaryTree::<i8>::new();
+        binary_tree.add(2);
+        binary_tree.add(3);
+        binary_tree.add(-1);
+        binary_tree.add(-4);
+
+        assert_eq!(binary_tree.contains(-1), true);
+
+        assert_eq!(binary_tree.remove(-1), Some(-1));
+
+        assert_eq!(binary_tree.contains(2), true);
+        assert_eq!(binary_tree.contains(3), true);
+        assert_eq!(binary_tree.contains(-4), true);
+    }
+
+    #[test]
+    fn should_inorder() {
+        let mut binary_tree = BinaryTree::<i8>::new();
+        binary_tree.add(2);
+        binary_tree.add(3);
+        binary_tree.add(-1);
+        binary_tree.add(-4);
+
+        binary_tree.inorder(|item| println!("{}", item));
+        assert!(true)
+    }
+
+    #[test]
+    fn should_preorder() {
+        let mut binary_tree = BinaryTree::<i8>::new();
+        binary_tree.add(2);
+        binary_tree.add(3);
+        binary_tree.add(-1);
+        binary_tree.add(-4);
+
+        binary_tree.preorder(|item| println!("{}", item));
+        assert!(true)
+    }
+
+    #[test]
+    fn should_postorder() {
+        let mut binary_tree = BinaryTree::<i8>::new();
+        binary_tree.add(2);
+        binary_tree.add(3);
+        binary_tree.add(-1);
+        binary_tree.add(-4);
+
+        binary_tree.postorder(|item| println!("{}", item));
+        assert!(true)
     }
 }
