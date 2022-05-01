@@ -33,28 +33,26 @@ where
     }
 
     pub fn add(&mut self, item: T) {
-        if let Some(ref mut first) = self.node {
-            let mut last_node = first;
-            loop {
-                if item > last_node.item {
-                    if let Some(ref mut right) = last_node.right {
-                        last_node = right
-                    } else {
-                        last_node.right = Some(Box::new(Node::new(item)));
-                        break;
-                    }
+        fn last<'a, T>(
+            option: &'a mut Option<Box<Node<T>>>,
+            item: &T,
+        ) -> &'a mut Option<Box<Node<T>>>
+        where
+            T: PartialEq<T>,
+            T: PartialOrd<T>,
+        {
+            if let Some(node) = option {
+                if *item > node.item {
+                    last(&mut node.right, item)
                 } else {
-                    if let Some(ref mut left) = last_node.left {
-                        last_node = left
-                    } else {
-                        last_node.left = Some(Box::new(Node::new(item)));
-                        break;
-                    }
+                    last(&mut node.left, item)
                 }
+            } else {
+                option
             }
-        } else {
-            self.node = Some(Box::new(Node::new(item)))
         }
+        let last = last(&mut self.node, &item);
+        *last = Some(Box::new(Node::new(item)));
     }
 
     pub fn inorder<F: Fn(&T)>(&self, f: F) {
