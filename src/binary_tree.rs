@@ -1,4 +1,4 @@
-use std::{cmp::PartialOrd, fmt::Debug, mem::replace};
+use std::{fmt::Debug};
 
 #[derive(Debug)]
 pub struct BinaryTree<T> {
